@@ -198,7 +198,11 @@ def run_store_briefing(store):
             p = item["properties"]
             msg += f"{idx + 1}. <b>{get_val(p.get('Log'))}</b>\n"
             for ln in get_val(p.get('이슈')).split('\n'):
-                if ln.strip(): msg += f"ㅤㅤ▪️ {re.sub(r'^[-*]\s*', '', ln.strip())}\n"
+                line = ln.strip()
+                if line:
+                    # 백슬래시가 포함된 정규표현식 처리를 f-string 밖에서 미리 수행
+                    clean_line = re.sub(r'^[-*]\s*', '', line)
+                    msg += f"ㅤㅤ▪️ {clean_line}\n"
     else:
         msg += "- 이슈 없음\n"
     msg += "</blockquote>\n"
@@ -210,9 +214,14 @@ def run_store_briefing(store):
     msg += "<blockquote>"
     if meeting_data:
         p = meeting_data[0]["properties"]
-        msg += f"<b>[{get_val(p.get('입력 날짜'))}] {get_val(p.get('Log'))}</b>\n"
+        m_date = get_val(p.get('입력 날짜'))
+        m_log = get_val(p.get('Log'))
+        msg += f"<b>[{m_date}] {m_log}</b>\n"
         for ln in get_val(p.get('내용')).split('\n'):
-            if ln.strip(): msg += f"ㅤㅤ▪️ {re.sub(r'^[-*]\s*', '', ln.strip())}\n"
+            line = ln.strip()
+            if line:
+                clean_line = re.sub(r'^[-*]\s*', '', line)
+                msg += f"ㅤㅤ▪️ {clean_line}\n"
     else:
         msg += "- 회의록 없음\n"
     msg += "</blockquote>\n"
@@ -245,26 +254,40 @@ def run_store_briefing(store):
 
 
 # === 5. 요일/시간별 실행 로직 ===
-if __name__ == "__main__":
-    now_kst = datetime.utcnow() + timedelta(hours=9)
-    weekday = now_kst.weekday()
-    hour = now_kst.hour
+# if __name__ == "__main__":
+#     now_kst = datetime.utcnow() + timedelta(hours=9)
+#     weekday = now_kst.weekday()
+#     hour = now_kst.hour
+#
+#     targets = []
+#     if weekday == 3 and hour == 10:  # 목 10시
+#         targets = ["신동 테네스"]
+#     elif weekday == 4:  # 금요일
+#         if hour == 12:
+#             targets = ["행궁 테네스"]
+#         elif hour == 13:
+#             targets = ["심금"]
+#     elif weekday == 6 and hour == 13:  # 일 13시
+#         targets = ["팔달맥주"]
+#
+#     for store in STORES:
+#         if store["name"] in targets:
+#             try:
+#                 run_store_briefing(store)
+#                 print(f"{store['name']} 전송 완료")
+#             except Exception as e:
+#                 print(f"{store['name']} 실패: {e}")
 
-    targets = []
-    if weekday == 3 and hour == 10:  # 목 10시
-        targets = ["신동 테네스"]
-    elif weekday == 4:  # 금요일
-        if hour == 12:
-            targets = ["행궁 테네스"]
-        elif hour == 13:
-            targets = ["심금"]
-    elif weekday == 6 and hour == 13:  # 일 13시
-        targets = ["팔달맥주"]
+if __name__ == "__main__":
+    # 지금 바로 테스트하기 위해 타겟을 강제로 모든 매장으로 설정
+    targets = ["행궁 테네스", "신동 테네스", "심금", "팔달맥주"]
 
     for store in STORES:
         if store["name"] in targets:
             try:
                 run_store_briefing(store)
                 print(f"{store['name']} 전송 완료")
+                import time
+                time.sleep(5) # AI 할당량 에러 방지용 5초 휴식
             except Exception as e:
                 print(f"{store['name']} 실패: {e}")
