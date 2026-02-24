@@ -1,0 +1,31 @@
+name: Store Briefing Automation
+
+on:
+  schedule:
+    - cron: '0 1 * * 4' # 목 10시
+    - cron: '0 3 * * 5' # 금 12시
+    - cron: '0 4 * * 5' # 금 13시
+    - cron: '0 4 * * 0' # 일 13시
+  workflow_dispatch: 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests google-genai python-dotenv
+
+      - name: Run script
+        env:
+          NOTION_KEY: ${{ secrets.NOTION_KEY }}
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python main.py
