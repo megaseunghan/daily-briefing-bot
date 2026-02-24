@@ -2,10 +2,10 @@ name: Store Briefing Automation
 
 on:
   schedule:
-    - cron: '0 1 * * 4' # 목 10시
-    - cron: '0 3 * * 5' # 금 12시
-    - cron: '0 4 * * 5' # 금 13시
-    - cron: '0 4 * * 0' # 일 13시
+    - cron: '0 1 * * 4'
+    - cron: '0 3 * * 5'
+    - cron: '0 4 * * 5'
+    - cron: '0 4 * * 0'
   workflow_dispatch: 
 
 jobs:

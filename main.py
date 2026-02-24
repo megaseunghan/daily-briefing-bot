@@ -3,6 +3,8 @@ import requests
 import os
 from datetime import datetime, timedelta
 from google import genai
+import pytz
+
 
 NOTION_KEY = os.environ.get("NOTION_KEY")
 BOT_TOKEN = os.environ.get("BOT_TOKEN")
@@ -265,40 +267,26 @@ def run_store_briefing(store):
 
 
 # === 5. 요일/시간별 실행 로직 ===
-# if __name__ == "__main__":
-#     now_kst = datetime.utcnow() + timedelta(hours=9)
-#     weekday = now_kst.weekday()
-#     hour = now_kst.hour
-#
-#     targets = []
-#     if weekday == 3 and hour == 10:  # 목 10시
-#         targets = ["신동 테네스"]
-#     elif weekday == 4:  # 금요일
-#         if hour == 12:
-#             targets = ["행궁 테네스"]
-#         elif hour == 13:
-#             targets = ["심금"]
-#     elif weekday == 6 and hour == 13:  # 일 13시
-#         targets = ["팔달맥주"]
-#
-#     for store in STORES:
-#         if store["name"] in targets:
-#             try:
-#                 run_store_briefing(store)
-#                 print(f"{store['name']} 전송 완료")
-#             except Exception as e:
-#                 print(f"{store['name']} 실패: {e}")
-
 if __name__ == "__main__":
-    # 지금 바로 테스트하기 위해 타겟을 강제로 모든 매장으로 설정
-    targets = ["행궁 테네스", "신동 테네스", "심금", "팔달맥주"]
+    KST = pytz.timezone('Asia/Seoul')
+    now_kst = datetime.now(KST)
 
+    weekday = now_kst.weekday()
+    hour = now_kst.hour
+
+    targets = []
+    # 2. 이제 한국 시간 기준으로 조건 비교
+    if weekday == 3 and hour == 10:  # 목 10시
+        targets = ["신동 테네스"]
+    elif weekday == 4:  # 금요일
+        if hour == 12:
+            targets = ["행궁 테네스"]
+        elif hour == 13:
+            targets = ["심금"]
+    elif weekday == 6 and hour == 13:  # 일 13시
+        targets = ["팔달맥주"]
+
+    # 3. 타겟이 있을 때만 실행
     for store in STORES:
         if store["name"] in targets:
-            try:
-                run_store_briefing(store)
-                print(f"{store['name']} 전송 완료")
-                import time
-                time.sleep(5) # AI 할당량 에러 방지용 5초 휴식
-            except Exception as e:
-                print(f"{store['name']} 실패: {e}")
+            run_store_briefing(store)
