@@ -178,12 +178,23 @@ def run_store_briefing(store):
                 msg += f"• {dt[5:].replace('-', '/')} | 실 {actual:,} ↔ 예 {expected:,} ({diff_s})\n"
     msg += "</blockquote>\n"
 
-    # 4. 종합 평가
-    eval_data = query_db(dbs["eval"], {"page_size": 1})
+    # 4. 종합 평가 (가장 최신 데이터 1개만 정렬해서 가져오기)
+    eval_payload = {
+        "sorts": [
+            {
+                "property": "날짜",
+                "direction": "descending"
+            }
+        ],
+        "page_size": 1
+    }
+    eval_data = query_db(dbs["eval"], eval_payload)
+
     msg += "⭐ <b>4. 종합 평가</b>\n"
     msg += "<blockquote>"
     if eval_data:
-        msg += f"{get_val(eval_data[0]['properties'].get('View')).strip()}\n"
+        eval_text = get_val(eval_data[0]['properties'].get('View')).strip()
+        msg += f"{eval_text}\n"
     else:
         msg += "- 데이터 없음\n"
     msg += "</blockquote>\n"
