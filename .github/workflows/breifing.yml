@@ -21,7 +21,7 @@ jobs:
           python-version: '3.13'
 
       - name: Install dependencies
-        run: pip install requests google-genai python-dotenv
+        run: pip install requests google-genai python-dotenv pytz
 
       - name: Run script
         env:
