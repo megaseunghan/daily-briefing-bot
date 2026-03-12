@@ -76,18 +76,30 @@ STORES = [
 
 
 def get_val(prop):
-    if not prop or isinstance(prop, str): return "-"
+    if not prop or isinstance(prop, (str, int, float)): return str(prop) if prop else "-"
     ptype = prop.get("type")
+    
     if ptype == "number": return str(prop.get("number"))
     if ptype == "select" and prop.get("select"): return prop["select"].get("name")
     if ptype == "rich_text" and prop.get("rich_text"): return prop["rich_text"][0].get("plain_text", "")
     if ptype == "title" and prop.get("title"): return prop["title"][0].get("plain_text", "")
-    if ptype == "formula":
-        f_type = prop["formula"].get("type")
-        return str(prop["formula"].get(f_type))
     if ptype == "date" and prop.get("date"): return prop["date"].get("start")
+    
+    if ptype == "formula":
+        f = prop.get("formula", {})
+        f_type = f.get("type")
+        return str(f.get(f_type)) if f_type else "-"
+        
+    if ptype == "rollup":
+        r = prop.get("rollup", {})
+        r_type = r.get("type")
+        if r_type == "number": return str(r.get("number"))
+        if r_type == "date": return r.get("date", {}).get("start")
+        if r_type == "array":
+            arr = r.get("array", [])
+            return [get_val(item) for item in arr] if arr else "-"
+            
     return "-"
-
 
 def get_array(prop):
     if not prop: return []
