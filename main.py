@@ -167,7 +167,7 @@ def run_store_briefing(store):
     msg += "<blockquote>"
     if sales_data:
         p = sales_data[0]["properties"]
-        mr = get_val(p.get('매출 일치율'))
+        mr = get_val(p.get('매출 일치율 누적 평균'))
         msg += f"총합: {mr}%\n"
         a_n, a_s, e_s = get_array(p.get('실제 날짜')), get_array(p.get('실제 매출액')), get_array(p.get('예상 매출액'))
         for i in range(len(a_n)):
